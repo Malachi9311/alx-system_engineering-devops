@@ -38,14 +38,13 @@ frontend web-frontend
 	bind *:443 ssl crt /etc/ssl/www.malachi-iv.tech/www.malachi-iv.tech.pem
 	
 	redirect scheme https code 301 if !{ ssl_fc }
+	
+	acl letsencrypt-acl path_beg /.well-known/acme-challenge/
+	use_backend letsencrypt-backend if letsencrypt-acl
 
-       # Test URI to see if its a letsencrypt request
-    	acl letsencrypt-acl path_beg /.well-known/acme-challenge/
-    	use_backend letsencrypt-backend if letsencrypt-acl
-	mode http
         default_backend web-backend
 backend letsencrypt-backend
-    	server letsencrypt 127.0.0.1:8888
+	server letsencrypt 127.0.0.1:8888
 backend web-backend
         balance roundrobin
         server 162837-web-01 52.91.128.247:80 check
